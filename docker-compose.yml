@@ -1,0 +1,30 @@
+version: '3'
+services:
+  app:
+    image: pirate-movie-app
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "${PORT}:${PORT}"
+    depends_on:
+      - mongodb
+    env_file: .env
+    networks:
+      - app-networks
+  
+  mongodb:
+    image: mongo
+    environment:
+      MONGO_URI: ${MONGO_URI}
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - app-networks
+
+networks:
+  app-networks:
+    driver: bridge
+
+volumes:
+  mongodb_data:

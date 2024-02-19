@@ -1,0 +1,45 @@
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger } from "@nestjs/common";
+import { Request, Response } from "express";
+import { checkPath } from "../utils/constants/whitelistPaths";
+import { checkMethod } from "src/utils/constants/checkMethodPath";
+
+
+@Catch(HttpException)
+export class HttpExceptionFilter implements ExceptionFilter {
+    private readonly logger: Logger;
+
+    constructor() {
+        this.logger = new Logger(HttpExceptionFilter.name);
+    }
+
+    catch(exception: HttpException, host: ArgumentsHost) {
+        let message = exception.getResponse() as any
+        const ctx = host.switchToHttp();
+        const response = ctx.getResponse<Response>();
+        const request = ctx.getRequest<Request>();
+        let status = exception.getStatus();
+
+        if(!checkPath(request.url)){
+            status = HttpStatus.NOT_FOUND
+            message.message = 'unknown url path'
+        }
+        else if(!checkMethod(request.method.toString(), request.url.toString())){
+            status = HttpStatus.METHOD_NOT_ALLOWED
+            message.message = 'invalid http method'
+        }
+
+        if(status === HttpStatus.BAD_REQUEST || status === HttpStatus.NOT_FOUND || status === HttpStatus.UNAUTHORIZED || status === HttpStatus.CONFLICT){
+            this.logger.log(`${request.ip} ${request.method} | ${request.url}: ${Array.isArray(message?.message) ? message?.message[0] : message?.message}`)
+        }
+        else if(status === HttpStatus.TOO_MANY_REQUESTS || status === HttpStatus.METHOD_NOT_ALLOWED || status === HttpStatus.FORBIDDEN){
+            this.logger.warn(`${request.ip} ${request.method} | ${request.url}: ${Array.isArray(message?.message) ? message?.message[0] : message?.message}`)
+        }
+        else this.logger.error(`${request.ip} ${request.method} | ${request.url}: ${Array.isArray(message?.message) ? message?.message[0] : message?.message}`);
+        
+        response
+            .status(status)
+            .json({
+                message: Array.isArray(message?.message) ? message?.message[0] : message?.message,
+            });
+    }
+}
