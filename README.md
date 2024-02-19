@@ -31,4 +31,5 @@ open with swagger
 http://localhost/8000/api
 ```
 
-if you need .env file, email <a href="naufal.razzan@binus.ac.id">me</a>
+If you need a .env file, email me at:
+[naufal razzan](mailto:naufal&#46;razzan&#64;binus&#46;ac&#46;id)
