@@ -1,6 +1,6 @@
 const methodPath = {
     'post': ['/auth/signin', '/auth/signup', '/movies/insertMovies', '/openList/insertNewOpenedMovies', '/orderMovie/createNewOrder'],
-    'get': ['/home', '/movies/searchMovies/:movieTitle', '/movies/allMovies', '/openList/fetchOpenedMovies', '/orderMovie/viewOrderHistory?name=test_guest'],
+    'get': ['/home', '/movies/searchMovies/:movieTitle', '/movies/allMovies', '/openList/fetchOpenedMovies', '/orderMovie/viewOrderHistory?name=*'],
     'patch': ['/movies/updateMovies'],
     'delete': ['/movies/removeMovies', '/orderMovie/deleteOrder?name=*&title=*']
 }

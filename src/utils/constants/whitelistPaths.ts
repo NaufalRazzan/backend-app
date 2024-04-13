@@ -9,8 +9,8 @@ const allowedPath = [
     '/openList/insertNewOpenedMovies',
     '/openList/fetchOpenedMovies',
     '/orderMovie/createNewOrder',
-    '/orderMovie/viewOrderHistory?name=test_guest',
-    '/orderMovie/deleteOrder?name=test_guest&title=Transformasi'
+    '/orderMovie/viewOrderHistory?name=*',
+    '/orderMovie/deleteOrder?name=*&title=*'
 ]
 
 export const checkPath = (path: string): boolean => {
