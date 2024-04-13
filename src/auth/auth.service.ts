@@ -32,7 +32,7 @@ export class AuthService {
         }
     }
 
-    async signIn(payload: SignInDto): Promise<string>{
+    async signIn(payload: SignInDto): Promise<string[]>{
         const user = await this.userModel.findOne({
             email: payload.email
         }).lean();
@@ -61,6 +61,6 @@ export class AuthService {
             }
         )
 
-        return acc_token
+        return [acc_token, user.role, user.userName]
     }
 }

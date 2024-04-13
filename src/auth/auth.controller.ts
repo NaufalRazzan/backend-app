@@ -33,7 +33,7 @@ export class AuthController {
 
         const totalTime = afterTime - beforeTime
 
-        this.logger.log(`${req.ip} ${req.method} | ${req.url}: Execution times ${totalTime} ms`)
+        this.logger.log(`${req.ip} ${HttpStatus.OK} ${req.method} | ${req.url} : New user ${body.username} - Execution times ${totalTime} ms`)
 
         return {
             message: 'new user added'
@@ -56,16 +56,16 @@ export class AuthController {
     @UsePipes(new ValidationPipe({ transform: true }))
     async signIn(@Req() req: Request, @Body() body: SignInDto){
         const beforeTime: any = new Date()
-        const token = await this.authService.signIn(body)
+        const [acc_token, role, username] = await this.authService.signIn(body)
         const afterTime: any = new Date()
 
         const totalTime = afterTime - beforeTime
 
-        this.logger.log(`${req.ip} ${req.method} | ${req.url}: Execution times ${totalTime} ms`)
+        this.logger.log(`${req.ip} ${HttpStatus.OK} ${req.method} | ${req.url} : ${role === 'admin' ? `Admin ${username}` : `User ${username}`} logged in - Execution times ${totalTime} ms`)
 
         return {
             message: 'welcome',
-            acc_token: token
+            acc_token: acc_token
         }
     }
 
