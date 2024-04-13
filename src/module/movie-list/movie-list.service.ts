@@ -29,12 +29,18 @@ export class MovieListService {
             return movie.title
         })
         const updatedData = payloads.map((data) => {
-            return {
-                genres: data.genres,
-                duration: data.duration,
-                rating: data.rating,
-                updatedAt: new Date()
+            const updateObject: Record<string, any> = {};
+            if (data.rating !== undefined) {
+              updateObject.rating = data.rating;
             }
+            if (data.genres !== undefined) {
+              updateObject.genres = data.genres;
+            }
+            if (data.duration !== undefined) {
+              updateObject.duration = data.duration;
+            }
+            updateObject.updatedAt = new Date();
+            return updateObject;
         })
 
         return await this.movieModel.updateMany(
@@ -44,7 +50,9 @@ export class MovieListService {
                 }
             },
             {
-                $set: updatedData
+                $set: {
+                    updatedData
+                }
             },
             {
                 new: true

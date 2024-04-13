@@ -74,7 +74,7 @@ export class OrderMovieController {
 
         const totalTime = afterTime - beforeTime
 
-        this.logger.log(`${req.ip} ${req.method} | ${req.url}: Execution times ${totalTime} ms`)
+        this.logger.log(`${req.ip} ${HttpStatus.OK} ${req.method} | ${req.url} : ${results.length} orders fetched for user ${username} - Execution times ${totalTime} ms`)
     
         return {
             message: `${results.length} orders fetched`,
@@ -113,7 +113,7 @@ export class OrderMovieController {
 
         const totalTime = afterTime - beforeTime
 
-        this.logger.log(`${req.ip} ${req.method} | ${req.url}: Execution times ${totalTime} ms`)
+        this.logger.log(`${req.ip} ${HttpStatus.OK} ${req.method} | ${req.url} : User ${name} has removed order for movie ${title} - Execution times ${totalTime} ms`)
     
         return {
             message: `${name} has deleted movie ${title} from order history`

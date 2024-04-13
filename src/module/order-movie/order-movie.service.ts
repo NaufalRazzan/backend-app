@@ -1,4 +1,4 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Movie, MovieDocument } from 'src/schema/movie.schema';
@@ -29,19 +29,24 @@ export class OrderMovieService {
             - total amount = openMovie.ticket_price * ticket_purchase_amount
         2. view history berdasarkan username
         3. cancel order berdasarkan movie_id
+        movie_id: new Types.ObjectId(movie._id),
+                start_time: new Date(payload.start_time),
+                finish_time: new Date(payload.finish_time)
     */
 
     async createOrder(payload: OrderMovieDto){
         const user = await this.userModel.findOne({ userName: payload.username }).lean();
         const movie = await this.movieModel.findOne({ title: payload.title }).lean();
         const openMovie = await this.openMovieModel.findOne({
-            movie_id: new Types.ObjectId(movie._id),
-            start_time: new Date(payload.start_time).toISOString(),
-            finish_time: new Date(payload.finish_time).toISOString()
-        })
+            $and: [
+                { movie_id: new Types.ObjectId(movie._id) },
+                { start_time: new Date(payload.start_time).toISOString() },
+                { finish_time: new Date(payload.finish_time).toISOString() }
+            ]
+        }).lean()
 
         if(!user || !movie || !openMovie){
-            throw new HttpException('data not found', HttpStatus.NOT_FOUND)
+            throw new NotFoundException('data not found')
         }
 
         if(openMovie.status === 'closed'){
@@ -77,7 +82,7 @@ export class OrderMovieService {
             }
         );
         if(incOpenMovie.modifiedCount == 0){
-            throw new HttpException('no data to be updated', HttpStatus.NOT_FOUND)
+            throw new NotFoundException('no data to be updated')
         }
 
         await this.orderMovieModel.create(orderPayload)
@@ -111,13 +116,7 @@ export class OrderMovieService {
             },
             {
                 $project: {
-                    movie_details: {
-                        _id: 1,
-                        title: 1,
-                        genres: 1,
-                        duration: 1,
-                        rating: 1
-                    },
+                    movie_details: { $arrayElemAt: ["$movie_details", 0] },
                     user_id: 1,
                     ticket_purchase_amounts: 1,
                     total_amount: 1,
@@ -135,16 +134,16 @@ export class OrderMovieService {
         const user = await this.userModel.findOne({ userName: username }).lean();
         const movie = await this.movieModel.findOne({ title: title }).lean();
         if(!user || !movie){
-            throw new HttpException('data not found', HttpStatus.NOT_FOUND)
+            throw new NotFoundException('data not found')
         }
 
         // get deleted document and immidietly delete it
         const deletedOrder = await this.orderMovieModel.findOneAndDelete({
-            user_id: user._id,
-            movie_id: movie._id
+            user_id: new Types.ObjectId(user._id),
+            movie_id: new Types.ObjectId(movie._id)
         }).lean()
         if(!deletedOrder){
-            throw new HttpException('no order to be deleted', HttpStatus.NOT_FOUND)
+            throw new NotFoundException('no order to be deleted')
         }
 
         // decerement avail seats

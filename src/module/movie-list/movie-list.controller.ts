@@ -39,7 +39,7 @@ export class MovieListController {
 
         const totalTime = afterTime - beforeTime
 
-        this.logger.log(`${req.ip} ${req.method} | ${req.url}: Execution times ${totalTime} ms`)
+        this.logger.log(`${req.ip} ${HttpStatus.OK} ${req.method} | ${req.url} : ${body.length} movies inserted - Execution times ${totalTime} ms`)
 
         return {
             message: `${body.length} movies inserted`
@@ -78,7 +78,7 @@ export class MovieListController {
 
         const totalTime = afterTime - beforeTime
 
-        this.logger.log(`${req.ip} ${req.method} | ${req.url}: Execution times ${totalTime} ms`)
+        this.logger.log(`${req.ip} ${HttpStatus.OK} ${req.method} | ${req.url} : ${movie ? `movie title ${movie.title} fetched` : `No movie title ${movie.title}`} - Execution times ${totalTime} ms`)
 
         return {
             message: `movie ${movie.title}`,
@@ -113,7 +113,7 @@ export class MovieListController {
 
         const totalTime = afterTime - beforeTime
 
-        this.logger.log(`${req.ip} ${req.method} | ${req.url}: Execution times ${totalTime} ms`)
+        this.logger.log(`${req.ip} ${HttpStatus.OK} ${req.method} | ${req.url} : ${movies ? `${movies.length} fetched` : 'Movies database empty'} - Execution times ${totalTime} ms`)
 
         return {
             message: `${movies.length} movies`,
@@ -143,7 +143,7 @@ export class MovieListController {
 
         const totalTime = afterTime - beforeTime
 
-        this.logger.log(`${req.ip} ${req.method} | ${req.url}: Execution times ${totalTime} ms`)
+        this.logger.log(`${req.ip} ${HttpStatus.OK} ${req.method} | ${req.url} : ${result.modifiedCount} updated - Execution times ${totalTime} ms`)
 
         return {
             message: `${result.modifiedCount} movies updated`
@@ -172,7 +172,7 @@ export class MovieListController {
 
         const totalTime = afterTime - beforeTime
 
-        this.logger.log(`${req.ip} ${req.method} | ${req.url}: Execution times ${totalTime} ms`)
+        this.logger.log(`${req.ip} ${HttpStatus.OK} ${req.method} | ${req.url} : ${result.deletedCount} removed - Execution times ${totalTime} ms`)
 
         return {
             message: `${result.deletedCount} movies removed`

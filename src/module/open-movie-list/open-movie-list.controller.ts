@@ -14,7 +14,9 @@ export class OpenMovieListController {
     constructor(
         private readonly openMovieService: OpenMovieListService,
         private readonly logger: Logger
-    ){}
+    ){
+        
+    }
 
     @ApiBearerAuth('acc token')
     @ApiBody({ type: [OpenMovieDto] })
@@ -38,7 +40,7 @@ export class OpenMovieListController {
 
         const totalTime = afterTime - beforeTime
 
-        this.logger.log(`${req.ip} ${req.method} | ${req.url}: Execution times ${totalTime} ms`)
+        this.logger.log(`${req.ip} ${HttpStatus.OK} ${req.method} | ${req.url} : ${body.length} movies inserted - Execution times ${totalTime} ms`)
 
         return {
             message: `${body.length} movies inserted`
@@ -72,7 +74,7 @@ export class OpenMovieListController {
 
         const totalTime = afterTime - beforeTime
 
-        this.logger.log(`${req.ip} ${req.method} | ${req.url}: Execution times ${totalTime} ms`)
+        this.logger.log(`${req.ip} ${HttpStatus.OK} ${req.method} | ${req.url} : ${results.length} movies fetched - Execution times ${totalTime} ms`)
 
         return {
             message: `${results.length} movies fetched`,
