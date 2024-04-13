@@ -16,7 +16,7 @@ export class MongoValidationErrorFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>()
 
     if(exception instanceof MongooseError && exception.name === 'ValidationError'){
-      this.logger.log(`${request.ip} ${request.method} | ${request.url}: ${exception.message}`);
+      this.logger.log(`${request.ip} ${request.statusCode} ${request.method} | ${request.url} : ${exception.message}`);
       response
         .status(HttpStatus.BAD_REQUEST)
         .json({
@@ -24,7 +24,7 @@ export class MongoValidationErrorFilter implements ExceptionFilter {
         })
     }
     else{
-      this.logger.error(`${request.ip} ${request.method} | ${request.url}: ${exception?.message}`);
+      this.logger.error(`${request.ip} ${request.statusCode} ${request.method} | ${request.url} : ${exception?.message}`);
       response
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json({
