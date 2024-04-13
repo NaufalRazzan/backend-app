@@ -1,6 +1,7 @@
 import { BadRequestException, CanActivate, ExecutionContext, HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
+import { TokenPayload } from 'src/utils/constants/tokenPayload';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -23,7 +24,7 @@ export class AuthGuard implements CanActivate {
     }
     
     try {
-      const res = await this.jwtservice.verifyAsync(token, { secret: process.env.SECRET_KEY_USER })
+      const res = await this.jwtservice.verifyAsync<TokenPayload>(token, { secret: process.env.SECRET_KEY_USER })
       request['token'] = res
     } catch (error) {
       throw new UnauthorizedException('please try again to login')
