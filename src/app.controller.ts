@@ -22,7 +22,7 @@ export class AppController{
 
         const totalTime = afterTime - beforeTime
 
-        this.logger.log(`${req.ip} ${req.method} | ${req.url}: Execution times ${totalTime} ms`)
+        this.logger.log(`${req.ip} ${HttpStatus.OK} ${req.method} | ${req.url} : Accessing homepage - Execution times ${totalTime} ms`)
 
         return result
     }
