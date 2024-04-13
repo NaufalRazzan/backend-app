@@ -27,7 +27,7 @@ export class OrderMovieDto {
     })
     @IsNotEmpty({ message: 'field cannot empty' })
     @Matches(/^(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},\s+\d{4}\s+\d{2}:\d{2}:\d{2}$/, { message:  'invalid date format `Month DD, YYYY:HH:mm:ss`'})
-    start_time: Date
+    start_time: string
 
     @ApiProperty({
         description: 'when does the movie closed',
@@ -36,7 +36,7 @@ export class OrderMovieDto {
     })
     @IsNotEmpty({ message: 'field cannot empty' })
     @Matches(/^(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},\s+\d{4}\s+\d{2}:\d{2}:\d{2}$/, { message:  'invalid date format `Month DD, YYYY:HH:mm:ss`'})
-    finish_time: Date
+    finish_time: string
 
     @ApiProperty({
         description: 'movie start',

@@ -3,6 +3,27 @@ import { IsAlphanumeric, IsEnum, IsNotEmpty, IsNumber, IsOptional, Matches } fro
 import { IsObjectId } from "class-validator-mongo-object-id";
 import { Types } from "mongoose";
 
+export type FetchOpenedMoviesResults = {
+    _id: Types.ObjectId,
+    available_seats: number,
+    max_seats: number,
+    room_code: string,
+    start_time: Date | string,
+    finish_time: Date | string,
+    ticket_price: number,
+    status: string,
+    movie_details: {
+        _id: Types.ObjectId,
+        title: string,
+        genres: string[],
+        duration: string,
+        rating: string,
+        createdAt: Date,
+        updatedAt: Date,
+        __v: number
+    }
+}
+
 export class OpenMovieDto{
     @ApiProperty({
         description: 'movie id based on the _id in movies table',

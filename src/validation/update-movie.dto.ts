@@ -2,7 +2,7 @@ import { PartialType } from "@nestjs/swagger";
 import { NewMovieDto } from "./new-movie.dto";
 
 export class UpdateMovieDto extends PartialType(NewMovieDto){
-    title?: string;
+    title: string;
 
     genres?: string[];
 
