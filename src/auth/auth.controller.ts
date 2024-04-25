@@ -11,7 +11,9 @@ export class AuthController {
     constructor(
         private readonly authService: AuthService,
         private readonly logger: Logger
-    ){}
+    ){
+        this.logger = new Logger(AuthController.name)
+    }
 
     @ApiBody({ type: NewUserDto })
     @ApiOkResponse({
@@ -29,15 +31,17 @@ export class AuthController {
     async signup(@Req() req: Request, @Body() body: NewUserDto){
         const beforeTime: any = new Date()
         await this.authService.signUp(body)
+        const msg = `New user ${body.username}`
+        const result = {
+            message: 'new user added'
+        }
         const afterTime: any = new Date()
 
         const totalTime = afterTime - beforeTime
 
-        this.logger.log(`${req.ip} ${HttpStatus.OK} ${req.method} | ${req.url} : New user ${body.username} - Execution times ${totalTime} ms`)
+        this.logger.log(`${req.ip} HTTP/:${req.httpVersion} ${req.headers['user-agent']} - ${HttpStatus.OK} ${req.method} ${req.url} '${msg}' ${Buffer.byteLength(JSON.stringify(result))} bytes ${totalTime} ms`)
 
-        return {
-            message: 'new user added'
-        }
+        return result
     }
 
     @ApiBody({ type: SignInDto })
@@ -57,16 +61,18 @@ export class AuthController {
     async signIn(@Req() req: Request, @Body() body: SignInDto){
         const beforeTime: any = new Date()
         const [acc_token, role, username] = await this.authService.signIn(body)
+        const msg = `${role === 'admin' ? `Admin ${username}` : `User ${username}`} logged in`
+        const result = {
+            message: 'welcome',
+            acc_token: acc_token
+        }
         const afterTime: any = new Date()
 
         const totalTime = afterTime - beforeTime
 
-        this.logger.log(`${req.ip} ${HttpStatus.OK} ${req.method} | ${req.url} : ${role === 'admin' ? `Admin ${username}` : `User ${username}`} logged in - Execution times ${totalTime} ms`)
+        this.logger.log(`${req.ip} HTTP/:${req.httpVersion} ${req.headers['user-agent']} - ${HttpStatus.OK} ${req.method} ${req.url} '${msg}' ${Buffer.byteLength(JSON.stringify(result))} bytes ${totalTime} ms`)
 
-        return {
-            message: 'welcome',
-            acc_token: acc_token
-        }
+        return result
     }
 
 }

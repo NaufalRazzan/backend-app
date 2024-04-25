@@ -28,18 +28,23 @@ export class HttpExceptionFilter implements ExceptionFilter {
             message.message = 'invalid http method'
         }
 
+        let msg = `${Array.isArray(message?.message) ? message?.message[0] : message?.message}`;
+        let size = Buffer.byteLength(msg);
+
         if(status === HttpStatus.BAD_REQUEST || status === HttpStatus.NOT_FOUND || status === HttpStatus.UNAUTHORIZED || status === HttpStatus.CONFLICT){
-            this.logger.log(`${request.ip} ${status} ${request.method} | ${request.url} : ${Array.isArray(message?.message) ? message?.message[0] : message?.message}`)
+            this.logger.log(`${request.ip} HTTP/:${request.httpVersion} ${request.headers['user-agent']} - ${status} ${request.method} ${request.url} '${msg}' ${size} bytes 0 ms`)
         }
         else if(status === HttpStatus.TOO_MANY_REQUESTS || status === HttpStatus.METHOD_NOT_ALLOWED || status === HttpStatus.FORBIDDEN){
-            this.logger.warn(`${request.ip} ${status} ${request.method} | ${request.url} : ${Array.isArray(message?.message) ? message?.message[0] : message?.message}`)
+            if(status === 429) msg = 'Too many requests'
+            this.logger.warn(`${request.ip} HTTP/:${request.httpVersion} ${request.headers['user-agent']} - ${status} ${request.method} ${request.url} '${msg}' ${size} bytes 0 ms`)
         }
-        else this.logger.error(`${request.ip} ${status} ${request.method} | ${request.url} : ${Array.isArray(message?.message) ? message?.message[0] : message?.message}`);
+        else this.logger.error(`${request.ip} HTTP/:${request.httpVersion} ${request.headers['user-agent']} - ${status} ${request.method} ${request.url} '${msg}' ${size} bytes 0 ms`);
+
         
         response
             .status(status)
             .json({
-                message: Array.isArray(message?.message) ? message?.message[0] : message?.message,
+                message: msg,
             });
     }
 }
