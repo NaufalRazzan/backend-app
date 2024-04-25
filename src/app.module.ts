@@ -1,4 +1,4 @@
-import { Logger, Module } from '@nestjs/common';
+import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -6,7 +6,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MovieModule } from './module/movie.module';
 import { AppController } from './app.controller';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerGuard, ThrottlerModule, seconds } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
       signOptions: { expiresIn: '30m' }
     }),
     ThrottlerModule.forRoot([{
-      ttl: 6000,
+      ttl: seconds(5),
       limit: 10
     }]),
     ScheduleModule.forRoot(),
@@ -28,6 +29,12 @@ import { ThrottlerModule } from '@nestjs/throttler';
     MovieModule
   ],
   controllers: [AppController],
-  providers: [Logger]
+  providers: [
+    Logger,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard
+    }
+  ]
 })
-export class AppModule {}
+export class AppModule{}
