@@ -15,7 +15,9 @@ export class MovieListController {
     constructor(
         private readonly movieService: MovieListService,
         private readonly logger: Logger
-    ){}
+    ){
+        this.logger = new Logger(MovieListController.name)
+    }
 
     @ApiBearerAuth('acc token')
     @ApiBody({ type: [NewMovieDto] })
@@ -35,15 +37,17 @@ export class MovieListController {
     async insertMovies(@Req() req: Request, @Body(new ParseArrayPipe({ items: NewMovieDto })) body: NewMovieDto[]){
         const beforeTime: any = new Date()
         await this.movieService.insertMovies(body)
+        const msg = `${body.length} movies inserted`
+        const result = {
+            message: `${body.length} movies inserted`
+        }
         const afterTime: any = new Date()
 
         const totalTime = afterTime - beforeTime
 
-        this.logger.log(`${req.ip} ${HttpStatus.OK} ${req.method} | ${req.url} : ${body.length} movies inserted - Execution times ${totalTime} ms`)
+        this.logger.log(`${req.ip} HTTP/:${req.httpVersion} ${req.headers['user-agent']} - ${HttpStatus.OK} ${req.method} ${req.url} '${msg}' ${Buffer.byteLength(JSON.stringify(result))} bytes ${totalTime} ms`)
 
-        return {
-            message: `${body.length} movies inserted`
-        }
+        return result
     }
 
     @ApiBearerAuth('acc token')
@@ -74,16 +78,18 @@ export class MovieListController {
     async fetchMoviesByTitle(@Req() req: Request, @Param('movieTitle') movieTitle: string){
         const beforeTime: any = new Date()
         const movie = await this.movieService.viewMovieFromTitle(movieTitle)
+        const msg = `${movie ? `movie title ${movie.title} fetched` : `No movie title ${movie.title}`}`
+        const result = {
+            message: `movie ${movie.title}`,
+            data: movie ? movie :  `no movie with the title ${movieTitle} exist`
+        }
         const afterTime: any = new Date()
 
         const totalTime = afterTime - beforeTime
 
-        this.logger.log(`${req.ip} ${HttpStatus.OK} ${req.method} | ${req.url} : ${movie ? `movie title ${movie.title} fetched` : `No movie title ${movie.title}`} - Execution times ${totalTime} ms`)
+        this.logger.log(`${req.ip} HTTP/:${req.httpVersion} ${req.headers['user-agent']} - ${HttpStatus.OK} ${req.method} ${req.url} '${msg}' ${Buffer.byteLength(JSON.stringify(result))} bytes ${totalTime} ms`)
 
-        return {
-            message: `movie ${movie.title}`,
-            data: movie ? movie :  `no movie with the title ${movieTitle} exist`
-        }
+        return result
     }
 
     @ApiBearerAuth('acc token')
@@ -109,16 +115,18 @@ export class MovieListController {
     async fetchAllMovies(@Req() req: Request){
         const beforeTime: any = new Date()
         const movies = await this.movieService.getAllMovies()
+        const msg = `${movies ? `${movies.length} fetched` : 'Movies database empty'}`
+        const result = {
+            message: `${movies.length} movies`,
+            data: movies ? movies :  []
+        } 
         const afterTime: any = new Date()
 
         const totalTime = afterTime - beforeTime
 
-        this.logger.log(`${req.ip} ${HttpStatus.OK} ${req.method} | ${req.url} : ${movies ? `${movies.length} fetched` : 'Movies database empty'} - Execution times ${totalTime} ms`)
+        this.logger.log(`${req.ip} HTTP/:${req.httpVersion} ${req.headers['user-agent']} - ${HttpStatus.OK} ${req.method} ${req.url} '${msg}' ${Buffer.byteLength(JSON.stringify(result))} bytes ${totalTime} ms`)
 
-        return {
-            message: `${movies.length} movies`,
-            data: movies ? movies :  []
-        }
+        return result 
     }
 
     @ApiBearerAuth('acc token')
@@ -138,16 +146,18 @@ export class MovieListController {
     @UseGuards(AuthGuard, PermitGuard)
     async updateMovies(@Req() req: Request, @Body(new ParseArrayPipe({ items: UpdateMovieDto })) body: UpdateMovieDto[]){
         const beforeTime: any = new Date()
-        const result = await this.movieService.updateMovies(body)
+        const res = await this.movieService.updateMovies(body)
+        const msg = `${res.modifiedCount} updated`
+        const result = {
+            message: `${res.modifiedCount} movies updated`
+        }
         const afterTime: any = new Date()
 
         const totalTime = afterTime - beforeTime
 
-        this.logger.log(`${req.ip} ${HttpStatus.OK} ${req.method} | ${req.url} : ${result.modifiedCount} updated - Execution times ${totalTime} ms`)
+        this.logger.log(`${req.ip} HTTP/:${req.httpVersion} ${req.headers['user-agent']} - ${HttpStatus.OK} ${req.method} ${req.url} '${msg}' ${Buffer.byteLength(JSON.stringify(result))} bytes ${totalTime} ms`)
 
-        return {
-            message: `${result.modifiedCount} movies updated`
-        }
+        return result
     }
 
     @ApiBearerAuth('acc token')
@@ -167,15 +177,17 @@ export class MovieListController {
     @UseGuards(AuthGuard, PermitGuard)
     async removeMovies(@Req() req: Request, @Body() body: string[]){
         const beforeTime: any = new Date()
-        const result = await this.movieService.removeMovies(body)
+        const res = await this.movieService.removeMovies(body)
+        const msg = `${res.deletedCount} removed`
+        const result = {
+            message: `${res.deletedCount} movies removed`
+        }
         const afterTime: any = new Date()
 
         const totalTime = afterTime - beforeTime
 
-        this.logger.log(`${req.ip} ${HttpStatus.OK} ${req.method} | ${req.url} : ${result.deletedCount} removed - Execution times ${totalTime} ms`)
+        this.logger.log(`${req.ip} HTTP/:${req.httpVersion} ${req.headers['user-agent']} - ${HttpStatus.OK} ${req.method} ${req.url} '${msg}' ${Buffer.byteLength(JSON.stringify(result))} bytes ${totalTime} ms`)
 
-        return {
-            message: `${result.deletedCount} movies removed`
-        }
+        return result
     }
 }

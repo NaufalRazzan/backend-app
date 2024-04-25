@@ -13,9 +13,11 @@ import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiTags } from '@nestjs/swagger'
 export class OpenMovieListController {
     constructor(
         private readonly openMovieService: OpenMovieListService,
-        private readonly logger: Logger
+        private readonly logger: Logger,
+        private readonly cron: Logger
     ){
-        
+        this.logger = new Logger(OpenMovieListController.name)
+        this.cron = new Logger('CRON')
     }
 
     @ApiBearerAuth('acc token')
@@ -36,15 +38,17 @@ export class OpenMovieListController {
     async insertNewOpenedMovies(@Req() req: Request, @Body(new ParseArrayPipe({ items: OpenMovieDto })) body: OpenMovieDto[]){
         const beforeTime: any = new Date()
         await this.openMovieService.insertOpenedMovies(body)
+        const msg = `${body.length} movies inserted`
+        const result = {
+            message: `${body.length} movies inserted`
+        }
         const afterTime: any = new Date()
 
         const totalTime = afterTime - beforeTime
 
-        this.logger.log(`${req.ip} ${HttpStatus.OK} ${req.method} | ${req.url} : ${body.length} movies inserted - Execution times ${totalTime} ms`)
+        this.logger.log(`${req.ip} HTTP/:${req.httpVersion} ${req.headers['user-agent']} - ${HttpStatus.OK} ${req.method} ${req.url} '${msg}' ${Buffer.byteLength(JSON.stringify(result))} bytes ${totalTime} ms`)
 
-        return {
-            message: `${body.length} movies inserted`
-        }
+        return result
     }
 
     @ApiBearerAuth('acc token')
@@ -70,39 +74,41 @@ export class OpenMovieListController {
     async fetchAll(@Req() req: Request){
         const beforeTime: any = new Date()
         const results = await this.openMovieService.fetchOpenedMovies()
+        const msg = `${results.length} movies fetched`
+        const result = {
+            message: `${results.length} movies fetched`,
+            data: results.length > 0 ? results : 'no movies opened currently'
+        }
         const afterTime: any = new Date()
 
         const totalTime = afterTime - beforeTime
 
-        this.logger.log(`${req.ip} ${HttpStatus.OK} ${req.method} | ${req.url} : ${results.length} movies fetched - Execution times ${totalTime} ms`)
+        this.logger.log(`${req.ip} HTTP/:${req.httpVersion} ${req.headers['user-agent']} - ${HttpStatus.OK} ${req.method} ${req.url} '${msg}' ${Buffer.byteLength(JSON.stringify(result))} bytes ${totalTime} ms`)
 
-        return {
-            message: `${results.length} movies fetched`,
-            data: results.length > 0 ? results : 'no movies opened currently'
-        }
+        return result
     }
 
     @Cron(CronExpression.EVERY_2_HOURS)
     async checkMoviesCron(){
-        this.logger.log('[CRON] [START] - Generate checking expired movies')
+        this.cron.log('[START] - Generate checking expired movies')
         const beforeTime: any = new Date()
         const res = await this.openMovieService.checkExpiredAndFullMovies()
         const afterTime: any = new Date()
 
         const totalTime = afterTime - beforeTime
 
-        this.logger.log(`[CRON] [FINISH] - Finish checking expired ${res.modifiedCount} movies: Execution time ${totalTime} ms`)
+        this.logger.log(`[FINISH] - Finish checking expired ${res.modifiedCount} movies ${totalTime} ms`)
     }
 
     @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
     async deleteMoviesCron(){
-        this.logger.log('[CRON] [START] - Generate deleting expired movies')
+        this.cron.log('[START] - Generate deleting expired movies')
         const beforeTime: any = new Date()
         const res = await this.openMovieService.deleteClosedMovies()
         const afterTime: any = new Date()
 
         const totalTime = afterTime - beforeTime
 
-        this.logger.log(`[CRON] [FINISH] - Finish deleting expired ${res.deletedCount} movies: Execution time ${totalTime} ms`)
+        this.logger.log(`[FINISH] - Finish deleting expired ${res.deletedCount} movies ${totalTime} ms`)
     }
 }

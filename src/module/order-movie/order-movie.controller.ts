@@ -31,15 +31,17 @@ export class OrderMovieController {
     async createNewOrder(@Req() req: Request, @Body() body: OrderMovieDto){
         const beforeTime: any = new Date()
         await this.orderService.createOrder(body)
+        const msg = `${body.username} has order ${body.ticket_purchase_amounts} ticket(s) for movie ${body.title}`
+        const result = {
+            message: 'new movie order created'
+        }
         const afterTime: any = new Date()
 
         const totalTime = afterTime - beforeTime
 
-        this.logger.log(`${req.ip} ${req.method} | ${req.url}: Execution times ${totalTime} ms`)
+        this.logger.log(`${req.ip} HTTP/:${req.httpVersion} ${req.headers['user-agent']} - ${HttpStatus.OK} ${req.method} ${req.url} '${msg}' ${Buffer.byteLength(JSON.stringify(result))} bytes ${totalTime} ms`)
 
-        return {
-            message: 'new movie order created'
-        }        
+        return result        
     }
 
     @ApiBearerAuth('acc token')
@@ -70,16 +72,18 @@ export class OrderMovieController {
     async view(@Req() req: Request, @Query('name') username: string){
         const beforeTime: any = new Date()
         const results = await this.orderService.viewOrderHistory(username)
+        const msg = `${results.length} orders fetched for user ${username}`
+        const result = {
+            message: `${results.length} orders fetched`,
+            data: results.length > 0 ? results : 'you have not made any purchased of ordering tickets'
+        }
         const afterTime: any = new Date()
 
         const totalTime = afterTime - beforeTime
 
-        this.logger.log(`${req.ip} ${HttpStatus.OK} ${req.method} | ${req.url} : ${results.length} orders fetched for user ${username} - Execution times ${totalTime} ms`)
+        this.logger.log(`${req.ip} HTTP/:${req.httpVersion} ${req.headers['user-agent']} - ${HttpStatus.OK} ${req.method} ${req.url} '${msg}' ${Buffer.byteLength(JSON.stringify(result))} bytes ${totalTime} ms`)
     
-        return {
-            message: `${results.length} orders fetched`,
-            data: results.length > 0 ? results : 'you have not made any purchased of ordering tickets'
-        }
+        return result
     }
 
     @ApiBearerAuth('acc token')
@@ -109,14 +113,16 @@ export class OrderMovieController {
     async deleteOrder(@Req() req: Request, @Query('name') name: string, @Query('title') title: string){
         const beforeTime: any = new Date()
         await this.orderService.deleteOrder(name, title)
+        const msg = `User ${name} has removed order for movie ${title}`
+        const result = {
+            message: `${name} has deleted movie ${title} from order history`
+        }
         const afterTime: any = new Date()
 
         const totalTime = afterTime - beforeTime
 
-        this.logger.log(`${req.ip} ${HttpStatus.OK} ${req.method} | ${req.url} : User ${name} has removed order for movie ${title} - Execution times ${totalTime} ms`)
+        this.logger.log(`${req.ip} HTTP/:${req.httpVersion} ${req.headers['user-agent']} - ${HttpStatus.OK} ${req.method} ${req.url} '${msg}' ${Buffer.byteLength(JSON.stringify(result))} bytes ${totalTime} ms`)
     
-        return {
-            message: `${name} has deleted movie ${title} from order history`
-        }
+        return result
     }
 }
