@@ -1,4 +1,4 @@
-import { ConflictException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { ConflictException, HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, MongooseError, Types } from 'mongoose';
 import { User, UserDocument } from 'src/schema/user.schema';
@@ -38,12 +38,12 @@ export class AuthService {
         }).lean();
 
         if(!user){
-            throw new HttpException('incorrect email or password', HttpStatus.UNAUTHORIZED)
+            throw new UnauthorizedException('incorrect email or password')
         }
 
         const isValidPass = await bcrypt.compare(payload.password, user.password)
         if(!isValidPass){
-            throw new HttpException('incorrect email or password', HttpStatus.UNAUTHORIZED)
+            throw new UnauthorizedException('incorrect email or password')
         }
 
         const tokenPayload = {
