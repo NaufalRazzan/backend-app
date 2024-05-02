@@ -10,11 +10,13 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   dotenv.config()
 
+  const log_dir = process.env.LOG_DIR || 'log';
+
   const app = await NestFactory.create(AppModule, {
     logger: WinstonModule.createLogger({
       transports: [
         new transports.File({
-          filename: 'log/server.log',
+          filename: `${log_dir}/server.log`,
           format: format.combine(format.timestamp(), format.json())
         }),
         new transports.Console({
