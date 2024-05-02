@@ -7,7 +7,9 @@ import { Request } from "express";
 export class AppController{
     constructor(
         private logger: Logger
-    ){}
+    ){
+        this.logger = new Logger(AppController.name)
+    }
     
     @HttpCode(HttpStatus.OK)
     @Get()
