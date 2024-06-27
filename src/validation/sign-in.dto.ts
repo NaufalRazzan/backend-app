@@ -3,9 +3,9 @@ import { IsEmail, IsNotEmpty, IsString } from "class-validator";
 
 export class SignInDto{
     @ApiProperty({
-        description: 'valid username',
+        description: 'valid email',
         type: String,
-        default: 'myUsername'
+        default: 'email@email.com'
     })
     @IsNotEmpty({ message: 'email cannot be empty' })
     @IsEmail({}, { message: `'email' must be type of valid email` })

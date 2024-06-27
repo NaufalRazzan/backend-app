@@ -11,7 +11,9 @@ export class OrderMovieController {
     constructor(
         private readonly orderService: OrderMovieService,
         private readonly logger: Logger
-    ){}
+    ){
+        this.logger = new Logger(OrderMovieController.name)
+    }
 
     @ApiBearerAuth('acc token')
     @ApiBody({ type: [OrderMovieDto] })

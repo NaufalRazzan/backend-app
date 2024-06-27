@@ -80,7 +80,7 @@ export class MovieListController {
         const movie = await this.movieService.viewMovieFromTitle(movieTitle)
         const msg = `${movie ? `movie title ${movie.title} fetched` : `No movie title ${movie.title}`}`
         const result = {
-            message: `movie ${movie.title}`,
+            message: `movie ${movie?.title}`,
             data: movie ? movie :  `no movie with the title ${movieTitle} exist`
         }
         const afterTime: any = new Date()

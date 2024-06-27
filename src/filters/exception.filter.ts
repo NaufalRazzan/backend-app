@@ -19,13 +19,21 @@ export class HttpExceptionFilter implements ExceptionFilter {
         const request = ctx.getRequest<Request>();
         let status = exception.getStatus();
 
-        if(!checkPath(request.url) && status !== HttpStatus.NOT_FOUND){
+        if(!checkPath(request.url) && status === HttpStatus.NOT_FOUND){
             status = HttpStatus.NOT_FOUND
-            message.message = 'unknown url path'
+
+            if(typeof message === 'string'){
+                message = 'unknown url path'
+            }
+            else message.message = 'unknown url path'
         }
-        else if(!checkMethod(request.method.toString(), request.url.toString()) && status !== HttpStatus.METHOD_NOT_ALLOWED){
+        else if(!checkMethod(request.method.toString(), request.url.toString()) && status === HttpStatus.METHOD_NOT_ALLOWED){
             status = HttpStatus.METHOD_NOT_ALLOWED
-            message.message = 'invalid http method'
+
+            if(typeof message === 'string'){
+                message = 'invalid http method'
+            }
+            else message.message = 'invalid http method'
         }
 
         let msg = `${Array.isArray(message?.message) ? message?.message[0] : message?.message}`;
