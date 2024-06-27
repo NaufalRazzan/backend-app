@@ -6,7 +6,6 @@ import { HttpExceptionFilter } from './filters/exception.filter';
 import * as dotenv from "dotenv";
 import { MongoValidationErrorFilter } from './filters/mongo-filter.filter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { MongoDB } from 'winston-mongodb';
 
 async function bootstrap() {
   dotenv.config()
@@ -16,17 +15,21 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: WinstonModule.createLogger({
       transports: [
-        new MongoDB({
-          db: process.env.MONGO_URI_LOG,
-          collection: 'serverLog',
-          options: {
-            useUnifiedTopology: true
-          },
-          format: format.combine(format.timestamp(), format.json())
-        }),
         new transports.File({
           filename: `${log_dir}/server.log`,
           format: format.combine(format.timestamp(), format.json())
+        }),
+        new transports.Http({
+          host: '127.0.0.1',
+          port: 3000,
+          path: '/predict',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          format: format.combine(
+            format.timestamp(),
+            format.json()
+          )
         }),
         new transports.Console({
           format: format.combine(
@@ -38,8 +41,9 @@ async function bootstrap() {
               return `${info.timestamp} ${info.level} - ${info.message}`
             })
           )
-        })
-      ]
+        }),
+      ],
+      
     })
   });
   
