@@ -28,7 +28,7 @@ $ docker compose up
 open with swagger
 ```bash
 # open in swagger
-http://localhost/8000/api
+http://localhost:8000/api
 ```
 
 If you need a .env file, email me at:
